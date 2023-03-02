@@ -10,26 +10,51 @@ class Game extends React.Component {
         onPress: PropType.func.isRequired
     }
     state = {
-        selectedNumber: []
+        selectedIds: [],
     };
     randomNumber = Array.from({ length: this.props.randomNumberCount }).map(() => 1 + Math.floor(40 * Math.random()));
     target = this.randomNumber.slice(0, this.props.randomNumberCount - 2).reduce((acc, curr) => acc + curr, 0);
 
     isNumberSelected = (numberIndex) => {
-        return this.state.selectedNumber.indexOf(numberIndex) >= 0;
+        return this.state.selectedIds.indexOf(numberIndex) >= 0;
     }
 
     selectNumber = (numberIndex) => {
         this.setState((prevState) => ({
-            selectedNumber: [...prevState.selectedNumber, numberIndex]
+            selectedIds: [...prevState.selectedIds, numberIndex]
         }))
     }
+
+    gameStatus = () => {
+        const sumSelected = this.state.selectedIds.reduce((acc, curr) => {
+            return acc + this.randomNumber[curr];
+        }, 0)
+
+        if (sumSelected < this.target) {
+            return "PLAYING";
+        }
+        if (sumSelected === this.target) {
+            return "WON"
+
+        }
+        if (sumSelected > this.target) {
+            return "LOST";
+        }
+    }
+
     render() {
+        const status = this.gameStatus()
         return (
             <View style={styles.container}>
                 <Text style={styles.heading}>Add Numbers</Text>
-                <Text style={styles.target}>{this.target}</Text>
-                <Text style={styles.sum}>Sum Area</Text>
+                <Text style={[styles.target, styles[`STATUS_${status}`]]}>{this.target}</Text>
+                <Text style={[styles.sum, styles[`STATUS_${status}`]]}>{
+
+                    this.state.selectedIds.map((number) => {
+                        return (this.randomNumber[number] + '+')
+                    }
+                    )
+                }</Text>
                 <View style={styles.numberConatiner}>
                     {this.randomNumber.map((number, index) =>
                         <Markup key={index}
@@ -41,6 +66,7 @@ class Game extends React.Component {
                 </View>
                 <Text style={styles.time}>Seconds Left</Text>
                 <Text style={styles.countdown}> 10 </Text>
+                <Text style={[styles.status, styles[`STATUS_${status}`]]}> {status}</Text>
             </View>
         )
     }
@@ -59,13 +85,15 @@ const styles = StyleSheet.create({
         textAlign: "center",
         fontSize: 40,
         marginBottom: 30,
+        letterSpacing: 2,
+        fontWeight: "bold"
     },
     target: {
         color: "white",
         fontSize: 40,
         textAlign: "center",
         backgroundColor: "grey",
-        borderRadius: 50,
+        borderRadius: 20,
         fontWeight: "900",
         letterSpacing: 3,
         paddingVertical: 10
@@ -75,11 +103,11 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: "center",
         backgroundColor: "#ddd",
-        borderRadius: 50,
+        borderRadius: 20,
         fontWeight: "900",
         letterSpacing: 3,
         paddingVertical: 10,
-        marginTop: 50
+        marginTop: 30
     },
     numberConatiner: {
         flexWrap: 'wrap',
@@ -99,7 +127,27 @@ const styles = StyleSheet.create({
         fontSize: 60,
         fontWeight: "bold",
         textAlign: "center",
+    },
+    status: {
+        color: "green",
+        textAlign: "center",
+        fontSize: 20,
+        fontWeight: "bold"
+
+    },
+    STATUS_LOST: {
+        color: "white",
+        backgroundColor: "red"
+    },
+    STATUS_WON: {
+        color: "white",
+        backgroundColor: "#E6A207"
+    },
+    STATUS_PLAYING: {
+        color: "white",
+        backgroundColor: "green"
     }
+
 
 
 
