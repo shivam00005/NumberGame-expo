@@ -9,7 +9,11 @@ class Markup extends React.Component {
         onPress: PropType.func.isRequired
     }
     handlerPress = () => {
-        this.props.onPress(this.props.id)
+        if (this.props.isDisabled) {
+            return;
+        } else {
+            this.props.onPress(this.props.id)
+        }
     }
     render() {
         return (
